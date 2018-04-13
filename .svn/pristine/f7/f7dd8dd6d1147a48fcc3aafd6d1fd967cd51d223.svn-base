@@ -1,0 +1,27 @@
+<style lang="scss" scoped>
+  @import '~@/styles/mixins', '~@/styles/variables';
+</style>
+<template>
+  <h1>仲裁</h1>
+</template>
+<script>
+
+  export default{
+    name: 'arbitration',
+    props:['model'],
+    components:{
+
+    },
+    data(){
+      return {
+
+      }
+    },
+    computed:{
+
+    },
+    methods:{
+
+    }
+  }
+</script>

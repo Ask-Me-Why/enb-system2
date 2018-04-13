@@ -1,0 +1,194 @@
+<style lang="scss">
+@import '~@/styles/mixins', '~@/styles/variables';
+.enb-menu-list {
+	background: map-get($color, 300D2);
+	.enb-menu-vertical{
+		background: rgba(map-get($color,400),.2);
+		border:none;
+
+		.el-menu-item,
+		.el-submenu__title{
+			border-bottom: 1px solid map-get($color,300S1);
+		}
+		.el-menu{
+			background: map-get($color,300D2);
+		}
+		.el-menu-item:focus{
+			outline: none;
+			background: transparent;
+		}
+		.el-submenu__title:focus{
+			outline: none;
+			background: transparent;
+		}
+		.el-menu-item:hover,
+		.el-submenu__title:hover{
+			background: rgba(map-get($color,400),.4);
+		}
+		.el-icon-arrow-down{
+			font-family:"iconfont" !important;
+			font-size: .12rem;
+			font-style:normal;
+			color: map-get($color,100);
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+		.el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
+			color: map-get($color,400);
+		}
+		.el-icon-arrow-down:before{
+			content: "\e600";
+
+		}
+	}
+	.enb-item{
+		width: 100%;
+		color: map-get($color,100);
+		font-size: .18rem;
+		.iconfont{
+			font: inherit;
+			font-size: .24rem;
+			color: map-get($color,400);
+		}
+		&>span{
+			padding: 0 .28rem;
+		}
+	}
+	.el-submenu{
+		.el-menu{
+			.enb-item{
+				padding-left: .34rem;
+			}
+		}
+	}
+	.el-menu-item.is-active{
+		.enb-item{
+			color: map-get($color,400);
+		}
+	}
+
+}
+
+</style>
+<template>
+	<div class="enb-menu-list">
+		<el-menu :default-active="$route.name" class="enb-menu-vertical">
+			<el-menu-item index="/">
+				<div class="enb-item" slot="title">
+					<i class="iconfont icon-jiankong"></i>
+					<span>监控</span>
+				</div>
+			</el-menu-item>
+			<el-submenu index="2">
+				<div class="enb-item" slot="title">
+					<i class="iconfont icon-saiche"></i>
+					<span slot="title">赛事</span>
+				</div>
+				<router-link :to="{ name: 'matchInformation' }">
+					<el-menu-item index="matchInformation">
+						<div class="enb-item">
+							赛事资料
+						</div>
+					</el-menu-item>
+				</router-link>
+        <router-link :to="{ name: 'matchStage' }">
+          <el-menu-item index="matchStage">
+            <div class="enb-item">
+              赛段
+            </div>
+          </el-menu-item>
+        </router-link>
+				<router-link :to="{ name: 'matchTeam' }">
+					<el-menu-item index="matchTeam">
+						<div class="enb-item">
+							车队/车辆
+						</div>
+					</el-menu-item>
+				</router-link>
+	      <router-link :to="{ name: 'matchFile' }">
+					<el-menu-item index="matchFile">
+						<div class="enb-item">
+							赛事文件
+						</div>
+					</el-menu-item>
+				</router-link>
+      </el-submenu>
+			<el-submenu index="3">
+				<div class="enb-item" slot="title">
+					<i class="iconfont icon-jiangbei"></i>
+					<span slot="title">成绩</span>
+				</div>
+				<el-menu-item index="3-1">
+					<div class="enb-item">
+						赛事成绩
+					</div>
+				</el-menu-item>
+			</el-submenu>
+			<el-submenu index="4">
+				<div class="enb-item" slot="title">
+					<i class="iconfont icon-duomeitizhuanqu"></i>
+					<span slot="title">媒体</span>
+				</div>
+				<el-menu-item index="4-1">
+					<div class="enb-item">
+						讯息发布
+					</div>
+				</el-menu-item>
+			</el-submenu>
+			<el-submenu index="5">
+				<div class="enb-item" slot="title">
+					<i class="iconfont icon-guanli"></i>
+					<span slot="title">管理</span>
+				</div>
+				<el-menu-item index="5-1">
+					<div class="enb-item">
+						功能权限
+					</div>
+				</el-menu-item>
+				<router-link :to="{ name: 'matchLogs' }">
+					<el-menu-item index="matchLogs">
+						<div class="enb-item">
+							操作记录
+						</div>
+					</el-menu-item>
+				</router-link>
+			</el-submenu>
+		</el-menu>
+	</div>
+</template>
+<script>
+/*
+0, //监控权限
+1, //赛事权限
+2, //成绩统计权限
+3, //媒体权限
+4, //管理权限
+5, //账户管理（赛事管理）
+6, //账户管理（权限管理）
+7, //账户管理 (全年积分)
+8, //记时裁判
+9 //其他权限
+
+'0' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], //超级管理员
+'1' => [0, 1, 2, 3, 4, 5, 6, 7, 8],//普通管理员
+'2' => [3, 6, 8],//成统
+'3' => [3, 6],//媒体
+'4' => [8]//计时裁判
+
+*/
+export default {
+	name: "MenuList",
+	data(){
+		return{
+			list:[
+				{
+					name: '监控',
+					icon: 'icon-jiankong',
+					path: ''
+				}
+			]
+		}
+	}
+}
+
+</script>

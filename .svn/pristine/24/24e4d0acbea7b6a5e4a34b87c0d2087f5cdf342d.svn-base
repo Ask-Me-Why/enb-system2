@@ -1,0 +1,50 @@
+@import '~@/styles/mixins';
+$backColor: #f1f1f1;
+$fontColor: #474a4f;
+.ask-button {
+    font-size: .16rem;
+    position: relative;
+    display: inline-block;
+    min-width: .88rem;
+    margin: 0;
+    padding: .12rem .16rem;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align: center;
+    vertical-align: baseline;
+    white-space: nowrap;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: $fontColor;
+    border: none;
+    border-radius: 2px;
+    outline: 0;
+    background-color: transparent;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    .button-text {
+        white-space: nowrap;
+        /* pointer-events:none; */
+    }
+    &>.ask-button-focus-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-transition: opacity .2s cubic-bezier(.35, 0, .25, 1), background-color .2s cubic-bezier(.35, 0, .25, 1);
+        transition: opacity .2s cubic-bezier(.35, 0, .25, 1), background-color .2s cubic-bezier(.35, 0, .25, 1);
+        pointer-events: none;
+        opacity: 0;
+        border-radius: inherit;
+        background-color: rgba(0, 0, 0, .12);
+    }
+    &:hover .ask-button-focus-overlay {
+        opacity: 1;
+    }
+}

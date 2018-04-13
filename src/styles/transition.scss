@@ -1,0 +1,92 @@
+/*
+* @Author: askMeWhy
+* @Date:   2017-09-26 14:32:04
+* @Last Modified by:   bigWave
+* @Last Modified time: 2017-10-17 10:53:36
+*/
+
+/* 进入过渡的开始状态 */
+.side-bar-slide-down-enter{
+	height: 0;
+}
+/* 过渡的状态 */
+.side-bar-slide-down-enter-active{
+	-webkit-transition: all .3s ease;
+	transition: all .3s ease;
+	overflow: hidden;
+}
+/* 进入过渡的结束状态 */
+.side-bar-slide-down-enter-to{
+
+	height: 100%;
+	height: auto;
+}
+
+/* 离开过渡的开始状态 */
+.side-bar-slide-down-leave{
+	height: 100%;
+	height: auto;
+}
+/* 过渡的状态 */
+.side-bar-slide-down-leave-active{
+	-webkit-transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	overflow: hidden;
+}
+/* 离开过渡的结束状态 */
+.side-bar-slide-down-leave-to{
+	height: 0;
+}
+
+
+/* 进入过渡的状态 */
+.side-bar-slide-down-enter-active{
+		max-height: 200px;
+	-webkit-animation: side-bar-enter .3s ease 1 both;
+	        animation: side-bar-enter .3s ease 1 both;
+	overflow: hidden;
+}
+@-webkit-keyframes side-bar-enter{
+	0%{
+		height: 0;
+		max-height: auto;
+	}
+	100%{
+		height: 100%;
+	}
+}
+@keyframes side-bar-enter{
+	0%{
+		height: 0;
+		max-height: auto;
+	}
+	100%{
+		height: 100%;
+	}
+}
+/* 离开过渡的状态 */
+.side-bar-slide-down-leave-active{
+		max-height: 200px;
+	-webkit-animation: side-bar-leave .3s cubic-bezier(1.0, 0.5, 0.8, 1.0) 1 both;
+	        animation: side-bar-leave .3s cubic-bezier(1.0, 0.5, 0.8, 1.0) 1 both;
+	overflow: hidden;
+}
+
+@-webkit-keyframes side-bar-leave{
+	0%{
+		height: 100%;
+	}
+	100%{
+		height: 0;
+	}
+}
+
+@keyframes side-bar-leave{
+	0%{
+		height: 100%;
+	}
+	100%{
+		height: 0;
+	}
+}
+

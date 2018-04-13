@@ -1,0 +1,18 @@
+.ask-confirm.ask-modal-box{
+  .ask-modal-wrapper{
+    width: 400px;
+  }
+}
+.confirm-btn{
+  padding: 8px 16px;
+}
+.ask-confirm-loader{
+  .inline-loader{
+    min-width: auto;
+  }
+}
+
+.confirm-box{
+  padding: 0 .2rem .3rem .2rem!important;
+  text-align: left!important;
+}

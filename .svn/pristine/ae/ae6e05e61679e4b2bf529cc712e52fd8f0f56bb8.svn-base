@@ -1,0 +1,180 @@
+<style lang="scss" scoped>
+  @import '~@/styles/mixins', '~@/styles/variables';
+  .title{
+    margin: .2rem 0 0 .3rem;
+  }
+  .titleNum{
+    position: absolute;
+    left: 6.4rem;
+  }
+  .deleteBtn{
+    width: 2rem!important;
+    position: absolute;
+    top:.7rem;
+  }
+  .preview{
+    position: relative!important;
+    left: 14rem;
+  }
+</style>
+<template>
+	<div class="mi-tab-pane">
+    <div class="title">标签</div>
+    <div class="mi-group">
+      <div class="value">
+        <input
+          v-validate="'required'"
+          :class="{'error': errors.has('titleName')}"
+          maxlength="10"
+          @input="upTitle"
+          v-model="title"
+          name="titleName"
+          class="mi-input"
+          type="text">
+        <span class="titleNum">{{titleNum}}/10</span>
+      </div>
+    </div>
+    <div class="mi-tab-btns">
+      <ask-button class="deleteBtn">删除标签及内容</ask-button>
+    </div>
+		<ask-tinymce v-model="content" :params="params" :url="url"></ask-tinymce>
+    <div class="buttom">
+      <div class="mi-tab-btns preview">
+        <ask-button @ask-click="openDialog">预览</ask-button>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  import { askDialogConfirm,askDialogToast,merge,askDialogPreview } from '@/utils';
+import { MatchApi } from '@/services';
+import { MatchOtherApi } from '@/services';
+const matchServer = new MatchApi();
+const matchOtherServer = new MatchOtherApi();
+let uploadData = matchServer.getUploadData();
+export default {
+	name: "InformationOther",
+	//数据
+	data() {
+		return {
+			// yys:'<p>dwadawdwdw</p>',
+			url: uploadData.url,
+			params: {
+				mode: 2,
+				token:'AOfai1G8Nc3kVHDBt7WbGoUW9pxBkppHi4iJzHb8AdmE6s0X-OcEq4sGQwPD'
+			},
+      text:'',
+      matchApi: new MatchOtherApi(),
+      "competition_id": this.$route.params.matchId,
+      "id": this.$route.params.matchId,
+      "title":'',
+      "content":''
+		}
+	},
+  mounted(){
+	  //获取内容信息
+    // alert(this.model)
+    this.getInfo();
+    this.$emit('child-say',this.title);
+  },
+  computed:{
+    titleNum(){
+      if(this.title == null){
+        return  0;
+      }else {
+        return this.title.length;
+      }
+    }
+  },
+	watch:{
+    'content'(n,o){
+      this.text = n
+    }
+	},
+  methods:{
+
+    //点击保存提交数据
+    onSubmit(){
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          this.$store.dispatch('ajaxRequestStart');
+          matchOtherServer.update(
+            {"competition_id": this.$route.params.matchId,
+              "id": this.$route.params.matchId,
+              "title":this.title,
+              "content":this.content}
+          ).then(r=>{
+            this.$store.dispatch('ajaxRequestEnd');
+            if(r.data.code != 200) return;
+            askDialogToast({msg:'自定义赛事信息保存成功！',time:2000,class:'success'});
+          },err=>{
+            this.$store.dispatch('ajaxRequestEnd');
+          });
+          return;
+        }
+        askDialogToast({msg:'请确保数据有效！',time:2000,class:'danger'});
+      });
+    },
+    //创建自定义赛事
+    createTo(){
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          this.$store.dispatch('ajaxRequestStart');
+          matchOtherServer.create(
+            {"competition_id": this.$route.params.matchId,
+            "id": this.$route.params.matchId,
+            "title":this.title,
+            "content":this.content}
+            ).then(r=>{
+            this.$store.dispatch('ajaxRequestEnd');
+            if(r.data.code != 200) return;
+            askDialogToast({msg:'自定义赛事信息创建成功！',time:2000,class:'success'});
+          },err=>{
+            this.$store.dispatch('ajaxRequestEnd');
+          });
+          return;
+        }
+        askDialogToast({msg:'请确保数据有效！',time:2000,class:'danger'});
+      });
+    },
+    //打开模态框
+    openDialog () {
+      askDialogPreview({
+        content: this.text,
+        title: '内容预览',
+        theme:'enb-confirm',
+      },(vm)=>{
+
+      })
+    },
+    //获取详情
+    getInfo(){
+      this.$store.dispatch('ajaxRequestStart');
+      this.matchApi.queryId({
+        //获取当前ID
+        id: this.$route.params.matchId
+      }).then(r=>{
+        this.$store.dispatch('ajaxRequestEnd');
+        if(r.data.code != 200) return;
+        let res = r.data.data;
+        //数据绑定
+        this.content = res.content;
+        this.title = res.title;
+        this.text = res.content;
+        this.upTitle();
+        // debugger
+        // console.log(res)
+      },err=>{
+        this.$store.dispatch('ajaxRequestEnd');
+      })
+    },
+    //向父组件传值
+    upTitle(){
+      this.$emit('child-say',this.title);
+    },
+    blankBlock(){
+
+    }
+  }
+}
+</script>

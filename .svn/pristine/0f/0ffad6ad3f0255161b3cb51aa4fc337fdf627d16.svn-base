@@ -1,0 +1,270 @@
+<style lang="scss">
+	@import '~@/styles/mixins', '~@/styles/variables';
+	.am-box{
+		padding: .32rem;
+		margin-top: .3rem;
+		width: 100%;
+		background: map-get($color,100);
+		.am-header{
+			width: 100%;
+			padding-bottom: .32rem;
+			@include flexLayout(flex,normal,center);
+			.screen{
+				@include flexLayout(inline-flex,normal,center);
+				.text{
+					font-size: .16rem;
+					line-height: 1;
+					color: map-get($color,300);
+					padding-right: 12px;
+					white-space: nowrap;
+				}
+				.value{
+					.el-input__inner{
+						font-size: .16rem;
+						padding-top: .12rem;
+						padding-bottom: .12rem;
+						width: 2.45rem;
+						height: .44rem;
+					}
+					.el-select .el-input.is-focus .el-input__inner,
+					.el-select .el-input__inner:focus{
+						border-color: map-get($color,100D2);
+					}
+				}
+			}
+			.ask-button{
+				padding: .1rem .2rem;
+				min-width: auto;
+				font-size: .18rem;
+				color: map-get($color,100);
+				background: map-get($color,400);
+				border-radius: .04rem;
+					vertical-align: top;
+					margin-left: .74rem;
+				.iconfont{
+					font: inherit;
+					color: inherit;
+					font-size: .20rem;
+					margin-right: .1rem;
+					vertical-align: top;
+				}
+			}
+		}
+		.hook-icon circle{
+			stroke:  map-get($color, 400);
+		}
+		.hook-icon path{
+			fill: map-get($color, 400);
+		}
+	}
+</style>
+<template>
+	<div class="account-manage">
+		<enb-tab>赛事管理</enb-tab>
+		<div class="am-box">
+			<div class="am-header">
+				<div class="screen">
+					<div class="text">
+						日期
+					</div>
+					<div class="value">
+						<el-select v-model="time" placeholder="请选择" @change="fliterYearMatchList" clearable>
+						    <el-option v-for="item,$i in timeList" :key="$i" :label="item" :value="item">
+						    </el-option>
+						</el-select>
+					</div>
+				</div>
+				<ask-button @click.native="createMatch">
+					<i class="iconfont icon-add"></i>
+					创建赛事
+				</ask-button>
+			</div>
+			<el-table 
+				class="enb-gray-table"
+				header-cell-class-name="thead-gray"
+				cell-class-name="thead-gray-body-cell"
+				:data="tableData" border style="width: 100%">
+				<el-table-column label="序号" width="150">
+					<template slot-scope="scope">
+						{{scope.$index+1+ (page - 1)*10}}
+					</template>
+				</el-table-column>
+				<el-table-column label="日期" width="458">
+					<template slot-scope="scope">
+						{{formatTime(scope.row.competition_start)}}至{{formatTime(scope.row.competition_end)}}
+					</template>
+				</el-table-column>
+				<el-table-column label="赛事名称" min-width="120">
+					<template slot-scope="scope">
+						<router-link :to="`/match/${scope.row.id}`">{{scope.row.name}}</router-link>
+					</template>
+				</el-table-column>
+				<el-table-column prop="area" label="赛事区域" min-width="120">
+				</el-table-column>
+				<el-table-column label="上线" width="170">
+					<template slot-scope="scope">
+						<template v-if="scope.row.is_online == 1">
+							<svg class="hook-icon" width="40" height="40" viewBox="0 0 1024 1024">
+								<circle r="400" cx="512" cy="512" fill="none" stroke="#000" stroke-width="50"/>
+								<path d="M750.90223558 294.74749282C597.84369055 388.64689628 486.8258972 507.21692047 436.72943262 566.62780308l-122.34613963-95.91333167-54.12432101 43.55119784 211.21072252 214.98683793c36.25070803-93.14418038 151.54809888-275.15294363 292.27133353-404.54783203l-12.83879245-29.95718233m0 0z"></path>
+							</svg>
+						</template>
+					</template>
+				</el-table-column>
+				<el-table-column label="操作" width="285">
+					<template slot-scope="scope">
+						<ask-button @click.native="handleEditMatch(scope.row)">操作</ask-button>
+						<ask-button class="del" @click.native="handleDel(scope.row)">删除</ask-button>
+					</template>
+				</el-table-column>
+			</el-table>
+			<el-pagination
+				class="enb-pagination"
+			    @size-change="handleSizeChange"
+			    @current-change="handleCurrentChange"
+			    :current-page.sync="page"
+			    :page-size="pageSize"
+			    layout="prev, pager, next, jumper,slot"
+			    :page-count="pageCount">
+			</el-pagination>
+			
+		</div>
+	</div>
+</template>
+<script>
+import moment from 'moment/moment.js';
+import { askDialogConfirm,askDialogToast,merge } from '@/utils';
+import { dialogMatchForm } from '@core/account';
+import { MatchManageApi } from '@/services';
+export default {
+	name:"AccountManage",
+	mounted(){
+		this.getMatchList();
+	},
+	data() {
+		return {
+			matchManageServer: new MatchManageApi(),
+			pageSize: 10,
+			pageCount: 0,
+			time: "",
+			timeList: [],
+			tableData: []
+		}
+	},
+	computed:{
+		page:{
+			get(){
+				return Number(sessionStorage.getItem(this.$route.path) || 1);
+			},
+			set(val){
+				sessionStorage.setItem(this.$route.path,val);
+			}
+		}
+	},
+	methods: {
+		fliterYearMatchList(){
+			this.getMatchList();
+		},
+		getMatchList(){
+			this.$store.dispatch('ajaxRequestStart');
+			this.matchManageServer.query({
+				page: this.page,
+				time: this.time
+			}).then(r=>{
+				this.$store.dispatch('ajaxRequestEnd');
+				if(r.data.code != 200) return;
+				let res = r.data.data;
+				this.tableData = res.list;
+				this.pageCount = res.pageCount;
+				let _min = Number(res.min), _max = Number(res.max);
+				let _list = []
+				for(let i = _min,l = _max; i <= l ; i++){
+					_list.push(i);
+				}
+				this.timeList = [..._list];
+			},err=>{
+				this.$store.dispatch('ajaxRequestEnd');
+			})
+		},
+		createMatch(){
+			dialogMatchForm({
+				title:'创建赛事',
+	            sure:(vm,model)=>{
+	            	this.$store.dispatch('ajaxRequestStart');
+	            	this.matchManageServer.create({
+	            		competition_name: model.name,
+	            		competition_start: model.startStamp,
+	            		competition_end: model.endStamp,
+	            		competition_area: model.address
+	            	}).then(r=>{
+	            		this.$store.dispatch('ajaxRequestEnd');
+	            		if(r.data.code != 200) return;
+	            		vm.close();
+	            		askDialogToast({msg:`已成功创建"${model.name}"赛事！`,time:2000,class:'success'});
+	            		this.getMatchList();
+	            	},err=>{
+	            		this.$store.dispatch('ajaxRequestEnd');
+	            	})
+	            },
+	            cancel:(vm)=>{}
+			})
+		},
+		handleSizeChange(val) {
+        	console.log(`每页 ${val} 条`);
+      	},
+      	handleCurrentChange(val) {
+      		this.page = val;
+      		this.getMatchList();
+      	},
+		handleEditMatch(item) {
+			dialogMatchForm({
+				title:'修改赛事',
+				item: item,
+	            sure:(vm,model)=>{
+	            	this.$store.dispatch('ajaxRequestStart');
+	            	let option = {
+	            		id: item.id,
+	            		competition_name: model.name,
+	            		competition_start: model.startStamp,
+	            		competition_end: model.endStamp,
+	            		competition_area: model.address,
+	            	};
+	            	option['is_online'] = model.online ? '1':'0';
+	            	this.matchManageServer.update(option).then(r=>{
+	            		this.$store.dispatch('ajaxRequestEnd');
+	            		if(r.data.code != 200) return;
+	            		vm.close();
+	            		askDialogToast({msg:`已更新"${model.name}"赛事信息！`,time:2000,class:'success'});
+	            		this.getMatchList();
+	            	},err=>{
+	            		this.$store.dispatch('ajaxRequestEnd');
+	            	})
+	            },
+	            cancel:(vm)=>{}
+			})
+		},
+		handleDel(item) {
+			askDialogConfirm({
+				content: `您是否确认删除“${item.name}”赛事`,
+				title: '提示',
+				theme:'enb-confirm'
+			},(vm)=>{
+				this.$store.dispatch('ajaxRequestStart');
+				this.matchManageServer.remove(item.id).then(r=>{
+					this.$store.dispatch('ajaxRequestEnd');
+					if(r.data.code != 200) return;
+					vm.close();
+					askDialogToast({msg:`已成功删除"${item.name}"赛事！`,time:2000,class:'success'});
+					this.getMatchList();
+				},err=>{
+					this.$store.dispatch('ajaxRequestEnd');
+				})
+			})
+		},
+		formatTime(time){
+			return moment.unix(time).format('YYYY-MM-DD');
+		}
+	}
+}
+
+</script>
